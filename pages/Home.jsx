@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native-web';
-
-import './Home.css';
+import { View, Text, StyleSheet } from 'react-native'; 
 
 function Home() {
     const [formulario, setFormulario] = useState({
@@ -14,9 +12,17 @@ function Home() {
 
     return (
         <View>
-            <p>Hola</p>
+            <Text>Hola</Text>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
+});
 
 export default Home;
