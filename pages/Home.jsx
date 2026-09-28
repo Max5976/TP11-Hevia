@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // librería para desplegador de opciones
+import DateTimePicker from '@react-native-community/datetimepicker'; // librería para selector de fecha para la edad, no compatible con web, solo funciona en móvil
 
 function Home() {
     const [formulario, setFormulario] = useState({
         nombreCompleto: '',
         email: '',
-        edad: '',
+        edad: 0,
         tipoEntrada: '', // 'general' o 'vip'
         telefono: '' // puede ser null / es opcional
     });
+    const [fechaNacimiento, setFechaNacimiento] = useState(new Date());
+    const [codigoPais, setCodigoPais] = useState('+54');
+    const [telefono, setTelefono] = useState('');
 
     const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,6 +31,54 @@ function Home() {
             console.log('La edad no es válida, debe haber algo escrito y debes ser mayor a 18 para entrar');
             return;
         }
+        else if (formulario.tipoEntrada.trim() === '') {
+            console.log('El tipo de entrada es obligatorio');
+            return;
+        }
+        else if (formulario.tipoEntrada.trim() === 'general' || formulario.tipoEntrada.trim() === 'vip') {
+            console.log('El tipo de entrada no es válido. Debe ser "general" o "vip"');
+            return;
+        }
+        else if (formulario.telefono.trim() !== '' && formulario.telefono.length < 10 || formulario.telefono.trim() !== '' && formulario.telefono.length > 15) {
+            console.log('El teléfono no es válido, debe tener al menos 10 dígitos y como máximo 15');
+            return;
+        }
+        else {
+            console.log('Formulario enviado correctamente');
+            console.log(formulario);
+            return;
+        }
+    }
+
+    function convertirFechaAEdad(fechaNacimiento) {
+        const hoy = new Date();
+
+        let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+
+        const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+        if (
+            mes < 0 ||
+            (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())
+        ) {
+            edad--;
+        }
+
+        return edad;
+    }
+
+    function formatearTelefono(valor) {
+        const numeros = valor.replace(/\D/g, '');
+
+        if (numeros.length <= 2) {
+            return numeros;
+        }
+
+        if (numeros.length <= 10) {
+            return numeros.slice(0, 2) + ' ' + numeros.slice(2);
+        }
+
+        return numeros.slice(0, 2) + ' ' + numeros.slice(2, 6) + '-' + numeros.slice(6, 10);
     }
 
     return (
@@ -34,39 +87,65 @@ function Home() {
             <Text style={styles.subtitulo}>Consigue tus entradas, no te lo pierdas al mejor festival del sur</Text>
             <Text style={styles.letraChica}>Entradas entre $100,000 y $500,000</Text>
             <View style={styles.formulario}>
-                <TextInput 
+                <View style={styles.campo}>
+                    <TextInput 
+                        style={styles.input}
+                        placeholder='Nombre completo'
+                        value={formulario.nombreCompleto}
+                        onChangeText={(valor) =>
+                            setFormulario({...formulario, nombreCompleto: valor})
+                        }
+                    />
+                </View>
+                <View style={styles.campo}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        value={formulario.email}
+                        keyboardType="email-address"
+                        onChangeText={(valor) =>
+                            setFormulario({...formulario, email: valor})
+                        }
+                    />
+                </View>
+                <DateTimePicker
                     style={styles.input}
-                    placeholder='Nombre completo'
-                    value={formulario.nombreCompleto}
-                    onChangeText={(valor) =>
-                        setFormulario({...formulario, nombreCompleto: valor})
+                    value={fechaNacimiento}
+                    mode="date"
+                    onChange={(_, fecha) => { // "_" significa que no me interesa el primer parámetro (el evento)
+                        if (fecha) {
+                            setFechaNacimiento(fecha);
+                            const edad = convertirFechaAEdad(fecha);
+                            setFormulario({
+                                ...formulario,
+                                edad
+                            });
+                        }
+                    }}
+                />
+                <Picker
+                    style={styles.input}
+                    selectedValue={formulario.tipoEntrada}
+                    onValueChange={(valor) => 
+                        setFormulario({...formulario, tipoEntrada: valor})
                     }
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={formulario.email}
-                    keyboardType="email-address"
-                    onChangeText={(valor) =>
-                        setFormulario({...formulario, email: valor})
-                    }
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Edad"
-                    keyboardType="numeric"
-                    value={formulario.edad}
-                    onChangeText={(valor) =>
-                        setFormulario({...formulario, edad: valor})
-                    }
-                />
-                <TextInput 
-                    style={styles.input}
-                    placeholder='TipoEntrada'
-                />
+                >
+                    <Picker.Item label="Elegí tu entrada" value="" />
+                    <Picker.Item label="General" value="general" />
+                    <Picker.Item label="VIP" value="vip" />
+                </Picker>
                 <TextInput 
                     style={styles.input}
                     placeholder='Telefono'
+                    value={formulario.telefono}
+                    onChangeText={(valor) => {
+                        const telefonoFormateado = formatearTelefono(valor);
+
+                        setFormulario({
+                            ...formulario,
+                            telefono: telefonoFormateado
+                        });
+                    }}
                 />
                 <Button 
                     style={styles.button}
