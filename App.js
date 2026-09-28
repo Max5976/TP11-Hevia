@@ -30,7 +30,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#162c58',
+
   },
   content: {
     flex: 1, // Esto empuja al Footer hacia abajo y al Header hacia arriba
