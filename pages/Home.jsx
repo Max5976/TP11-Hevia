@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingVertical: 15,
         alignItems: 'center',
-        minHeight: 900,
+        minHeight: 300
     },
 
     campo: {
