@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         borderRadius: 10,
         paddingVertical: 15,
-        alignItems: 'center'
+        alignItems: 'center',
         minHeight: 900,
     },
 
